@@ -1,4 +1,4 @@
-const { exec } = require("child_process");
+const { exec ,spawn} = require("child_process");
 const config = require("./config");
 const moment = require('moment')
 
@@ -27,23 +27,29 @@ exec(`ps -ef | grep Pal`, (err, stdout, stderr) => {
   }
 });
 
-const startCMD = `nohup ${config.palServerPath} ${config.palStartArgs} &`;
-
 function startProcess() {
   console.log(startCMD) 
+  const startSpawn = spawn('nohup',[config.palServerPath , '&'])
+  startSpawn.on('close',()=>{
+    console.log('start spawn 退出')
+  })
+  startSpawn.stdout.on('data',(data)=>{
+    console.log("[start pal]"+data)
+  })
 
-  exec(startCMD, (err, stdout, stderr) => {
-    if (err) {
-      console.error(
-        `[${moment().format("HH:mm:ss")}] Error starting process: ${err}`
-      );
-      return;
-    }
-    if (stderr) {
-      console.error(
-        `[${moment().format("HH:mm:ss")}] Standard error output: ${stderr}`
-      );
-    }
-    console.log(`[${moment().format("HH:mm:ss")}] Process started: ${stdout}`);
-  });
+
+  // exec(startCMD, (err, stdout, stderr) => {
+  //   if (err) {
+  //     console.error(
+  //       `[${moment().format("HH:mm:ss")}] Error starting process: ${err}`
+  //     );
+  //     return;
+  //   }
+  //   if (stderr) {
+  //     console.error(
+  //       `[${moment().format("HH:mm:ss")}] Standard error output: ${stderr}`
+  //     );
+  //   }
+  //   console.log(`[${moment().format("HH:mm:ss")}] Process started: ${stdout}`);
+  // });
 }
